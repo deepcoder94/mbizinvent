@@ -27,6 +27,10 @@
     <script
       src="{{ asset('public/assets/js/bootstrap.min.js')}}"
     ></script>
+    <script src="{{ asset('public/assets/js/toastr.min.js')}}"></script>
+
+    <script src="{{ asset('public/assets/js/jquery-ui.min.js') }}"></script>
+
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="{{ asset('public/assets/js/adminlte.js')}}"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
@@ -49,5 +53,19 @@
           });
         }
       });
+
+      function closeModal(id){
+        $(`#${id}`).modal('hide');
+      }
+
+      function triggerSaveChanges(modalId){
+        // Create a new custom event called 'myCustomEvent'
+        $("#addEditForm").submit();
+      }
+
+      $( function() {
+    $( ".datepicker" ).datepicker();
+  } );
+
     </script>
     <!--end::OverlayScrollbars Configure-->

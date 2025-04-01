@@ -1,5 +1,5 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>AdminLTE | Dashboard v3</title>
+<title>MBizInvent</title>
 <!--begin::Primary Meta Tags-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="title" content="AdminLTE | Dashboard v3" />
@@ -32,6 +32,7 @@
 />
 <!--end::Third Party Plugin(Bootstrap Icons)-->
 <!--begin::Required Plugin(AdminLTE)-->
+<link rel="stylesheet" href="{{ asset('public/assets/css/toastr.min.css') }}">
 <link rel="stylesheet" href="{{asset('public/assets/css/adminlte.css')}}" />
 <!--end::Required Plugin(AdminLTE)-->
 <!-- apexcharts -->
@@ -39,3 +40,7 @@
   rel="stylesheet"
   href="{{asset('public/assets/css/apexcharts.css')}}"
 />
+
+<link rel="stylesheet" href="{{ asset('public/assets/css/jquery-ui.min.css') }}">
+
+<script src="{{ asset('public/assets/js/jquery.min.js') }}"></script>
