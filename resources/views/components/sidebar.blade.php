@@ -70,6 +70,12 @@
                     <p>Generate Invoice</p>
                   </a>
                 </li>                                                
+                <li class="nav-item">
+                  <a href="{{ route('invoiceList') }}" class="nav-link {{ Route::currentRouteName() == 'invoiceList'?'active':'' }}">
+                    <i class="nav-icon bi bi-palette"></i>
+                    <p>Invoice List</p>
+                  </a>
+                </li>                                                
 
               </ul>
               <!--end::Sidebar Menu-->

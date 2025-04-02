@@ -8,7 +8,8 @@
                   <div class="card">
                     <div class="card-header">
                       <h3 class="card-title">Generate Invoice</h3>
-                    </div>
+                    </div>  
+                    <form id="invForm" method="POST">
                     <div class="card-body">
                         <div class="card card-primary">
                             <div class="card-header">
@@ -49,7 +50,7 @@
                                 <h3 class="card-title">Product Information</h3>
                             </div>
                             <div class="card-body">
-                                <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
+                                <button class="btn btn-primary" type="button" onclick="addProduct()">Add Product</button>
                                 <table class="table table-bordered mt-3">
                                     <thead>
                                         <tr>
@@ -77,15 +78,28 @@
                                 <table class="table table-bordered mt-3">
                                     <thead>
                                         <tr>
-                                            <th>Quantity</th>
+                                            <th>Qty</th>
                                             <th>Rate</th>
                                             <th>Gross Total</th>
                                             <td>Discount</td>
                                             <td>Taxable Value</td>
-                                            <th>CGST <br/>%</th>
-                                            <th>SGST</th>
+                                            <th colspan="2">CGST</th>
+                                            <th colspan="2">SGST</th>
                                             <th>Round Off</th>
                                             <th>Total</th>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                     </thead>
                                     @include('pages.generate-invoice.total-invoice')
@@ -96,8 +110,11 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary mt-3" onclick="generateInvoice()">Generate Invoice</button>
+                        <button class="btn btn-primary mt-3" type="button" onclick="generateInvoice()">Generate Invoice</button>
                     </div>
+
+                </form>
+                    
                   </div>
                 </div>
               </div>

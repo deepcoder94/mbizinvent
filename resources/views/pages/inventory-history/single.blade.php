@@ -11,7 +11,7 @@
         {{ $i->buying_price }}
     </td>    
     <td>
-        <span class="badge bg-success">{{ $i->action }}</span>
+        <span class="badge {{ $i->action == 'added'?'bg-success':'bg-danger' }}">{{ $i->action }}</span>
     </td>
     <td>
         {{ \Carbon\Carbon::parse($i->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}        

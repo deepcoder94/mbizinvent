@@ -45,7 +45,8 @@ class InventoryController extends Controller
             InventoryHistory::create([
                 'product_id'=>$validated['product_id'],
                 'stock_out_in'=>$validated['stock_count'],
-                'buying_price'=>$validated['buying_price']
+                'buying_price'=>$validated['buying_price'],
+                'action'=>'added'
             ]);
 
             $total_stock = $inventory->available_stock + $validated['stock_count'];
