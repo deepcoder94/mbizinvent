@@ -75,11 +75,11 @@ class CustomerController extends Controller
             'customer_name' => 'required|string',
             'address' => 'required|string',
             'state' => 'required|string',
-            'state_code' => 'required|string',
-            'city' => 'required|string',
-            'phone' => 'required|string',
-            'gstin_number' => 'required|string',
-            'pan_number' => 'required|string',
+            'state_code' => 'string',
+            'city' => 'string',
+            'phone' => 'string',
+            'gstin_number' => 'string',
+            'pan_number' => 'string',
 
         ]);
 
@@ -90,8 +90,8 @@ class CustomerController extends Controller
             'state_code'=>$validated['state_code'],
             'city'=>$validated['city'],
             'phone'=>$validated['phone'],
-            'gstin_number'=>$validated['gstin_number'],
-            'pan_number'=>$validated['pan_number']
+            'gstin_number'=>$validated['gstin_number']??'',
+            'pan_number'=>$validated['pan_number']??''
         ]);
 
         return response()->json(['success' => true, 'message' => 'Customer created successfully!']);
@@ -127,10 +127,10 @@ class CustomerController extends Controller
             'address' => 'required|string',
             'state' => 'required|string',
             'state_code' => 'required|string',
-            'city' => 'required|string',
-            'phone' => 'required|string',
-            'gstin_number' => 'required|string',
-            'pan_number' => 'required|string',
+            'city' => 'string',
+            'phone' => 'string',
+            'gstin_number' => '',
+            'pan_number' => '',
 
         ]);
 

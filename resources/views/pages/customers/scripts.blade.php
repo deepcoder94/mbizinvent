@@ -118,15 +118,15 @@
     function revalidateForm(id){
         let elem = $("#"+id);
         let errorDiv = $(`#${id}-error`);
-        if(elem.val().length > 0){
-            elem.removeClass('is-invalid');
-            errorDiv.addClass('d-none');
-        }
-        else{
-            elem.addClass('is-invalid');
-            errorDiv.removeClass('d-none');
-            errorDiv.html(`${id} is required`)
-        }
+        // if(elem.val().length > 0){
+        //     elem.removeClass('is-invalid');
+        //     errorDiv.addClass('d-none');
+        // }
+        // else{
+        //     elem.addClass('is-invalid');
+        //     errorDiv.removeClass('d-none');
+        //     errorDiv.html(`${id} is required`)
+        // }
     }
 
     function deleteCustomer(event){
