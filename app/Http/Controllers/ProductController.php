@@ -10,11 +10,53 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $currentPage = 'productList';
-        $products = Product::orderBy('id','desc')->get();
-        return view('pages.products.list',compact('currentPage','products'));        
+        $perPage = 10;
+        $currentPageNum = 1;
+
+        $isSingleView = false;
+        $view = 'pages.products.list';
+
+        $query = Product::query();
+        $query->orderBy('id','desc');
+        $totalRecords = Product::count();
+
+        $pageNums = $totalRecords / $perPage;
+        $totalpagenums = is_float($pageNums) ? (int)$pageNums + 1 : $pageNums;
+        $skipCount = ($currentPageNum-1) * $perPage;
+
+        if(!empty($request->input('perPage'))){
+            $perPage = $request->input('perPage');
+            $isSingleView = true;
+        }
+        if(!empty($request->input('currentPage'))){
+            $currentPageNum = $request->input('currentPage');
+            $isSingleView = true;
+
+        }
+        if(!empty($request->input('searchString')) || $request->has('searchString')){
+            $searchString =$request->input('searchString');
+            $isSingleView = true;
+            $query->where('product_description','LIKE',"%{$searchString}%");
+
+        }        
+
+        if($isSingleView){
+            $view = 'pages.products.single';
+
+        }
+
+        $query->take($perPage);
+
+        $query->skip($skipCount);     
+        
+        $products = $query->get();
+
+        // $products = Product::orderBy('id','desc')->take($perPage)->skip($skipCount)->get();
+
+        
+        return view($view,compact('products','totalpagenums','totalRecords'));        
     }
 
     /**
@@ -100,4 +142,89 @@ class ProductController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Product not Found!']);           
     }
+
+    public function exportProducts(){
+        // Fetch products with their related measurements
+        $products = Product::get();
+
+        // Generate the filename
+        $filename = 'products-' . now()->timestamp . '.csv';
+
+        // Define the path where the file will be stored
+        $filePath = storage_path('app/' . $filename);
+
+        // Open the file for writing
+        $handle = fopen($filePath, 'w');
+
+        // Add the CSV column headings (optional)
+        fputcsv($handle, ['ID','Hsn Code', 'Product Description', 'rate']);
+
+        // Loop through the data and write each row to the CSV file
+        foreach ($products as $p) {
+            // Write the product row to the CSV
+            fputcsv($handle, [
+                $p->id,
+                $p->hsn_code,
+                $p->product_description,
+                $p->rate,
+            ]);
+        }
+
+        // Close the file handle
+        fclose($handle);
+
+        // Return the file path so it can be used for the download
+        return response()->json(['url_path'=> route('exportDownload',['file'=>$filename])]);
+
+    }
+
+    public function importProducts(Request $request){
+        // Validate the uploaded file
+        $request->validate([
+            'file_csv' => 'required|mimes:csv,txt|max:2048', // You can adjust file type and size
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('file_csv')) {
+            $file = $request->file('file_csv');
+
+            // Process the CSV (example)
+            $csvData = $this->parseCsv($file);
+            foreach ($csvData as $csv) {
+                // Use Laravel's Collection to transform the keys
+                $newArray = collect($csv)
+                    ->mapWithKeys(function ($value, $key) {
+                        // Convert the key to lowercase and replace spaces with underscores
+                        $newKey = strtolower(str_replace(' ', '_', $key));
+                        return [$newKey => $value];
+                    })
+                    ->toArray();
+                    
+                Product::upsert($newArray,['id'],['product_description','hsn_code','rate']);
+                                
+            }
+
+            return response()->json(['success' => 'File uploaded successfully!']);
+        }
+
+        return response()->json(['error' => 'No file uploaded.'], 400);  
+    }
+
+    private function parseCsv($file)
+    {
+        $csvData  = [];
+        $filePath = $file->getRealPath();
+        $file     = fopen($filePath, 'r');
+
+        // Assuming the first row contains headers
+        $header = fgetcsv($file);
+
+        while (($row = fgetcsv($file)) !== false) {
+            $csvData[] = array_combine($header, $row); // Combine headers with data
+        }
+
+        fclose($file);
+
+        return $csvData;
+    }    
 }

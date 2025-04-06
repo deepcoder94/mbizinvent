@@ -15,7 +15,7 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body p-0">
-                      <table class="table">
+                      <table class="table" id="hiTable">
                         <thead>
                           <tr>
                             <th>HSN Code</th>
@@ -26,11 +26,54 @@
                             <th>Updated Date</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="hiBody">
                             @include('pages.inventory-history.single',['history'=>$history])
                         </tbody>
                       </table>
+                      <div class="loader-holder" style="display:none">
+                        <div class="d-flex" style="justify-content: center;padding: 60px;">
+                            <div class="loader"></div> 
+                        </div>
+                      </div>
+
                     </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-lg-2 d-flex">
+                                <span
+                                    style="
+                                        width: 139px;
+                                        margin-top: 7px;
+                                    "
+                                    >Per Page</span
+                                >
+                                <select
+                                    id="perPage"
+                                    class="form-control"
+                                    onchange="paginate()"
+                                >
+                                @foreach(range(10, 100, 10) as $number)
+                                    <option value="{{ $number }}">{{ $number }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3 d-flex">
+                                <span style="
+                                        width: 173px;
+                                        margin-top: 7px;
+                                    ">Current Page</span>
+                                <select id="currentPage" class="form-control" onchange="paginate()">
+                                    @foreach (range(1, $totalpagenums, 1) as $n)
+                                        <option value="{{ $n }}">{{ $n }}</option>                                        
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3" style="margin-top: 7px">
+                                Total Records <span>{{ $totalRecords }}</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- /.card-body -->
                   </div>
                   <!-- /.card -->
@@ -42,108 +85,5 @@
             </div><!-- /.container-fluid -->
           </section>        
     </div>
-    <script>
-        function showAddInventoryModal(){
-            let url = '{{ route('inventory.create') }}';
-            let storeurl = '{{ route('inventory.store') }}'
-
-            $.ajax({
-                url: url, // The URL defined in your routes
-                type: "GET",
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                        "content"
-                    ), // CSRF Token
-                },
-                success: function (response) {
-                    $("#addEditModalBody").html(response)
-                    $("#modalTitle").html('Add Inventory');
-                    $("#addEditModal").modal('show');
-
-                    validateAndSubmitFormFields(false,storeurl);
-                    
-                },
-                error: function(err){
-
-                }
-            });
-        }      
-         
-        function validateAndSubmitFormFields(isEdit,url){
-            $("#addEditForm").on("submit", function(ev){
-                ev.preventDefault();
-                console.log(url);
-                
-                let values = $("#addEditForm").serializeArray();  
-                let isFormValid = true;
-                let errors = [];
-                values.some((v)=>{
-                    
-                    if(v.value.length == 0){
-                        errors.push({
-                            key: v.name,
-                            error: `${v.name} is required`
-                        });
-                        isFormValid = false
-                    }                    
-                });
-
-                if(errors.length > 0){
-                    
-                    errors.some((er)=>{
-                        let field = $(`#${er.key}`);
-                        let errorField = $(`#${er.key}-error`);                        
-
-                        field.addClass('is-invalid')
-                        errorField.removeClass('d-none')
-                        errorField.html(`${er.key} is required`);
-                        
-                    });
-                }
-                else{
-
-                    $.ajax({
-                        url:url,
-                        type: isEdit ? 'PUT':'POST',
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                "content"
-                            ), // CSRF Token
-                        },                        
-                        data:values,
-                        success: function(response){
-                            if(response.success){
-                                alert(response.message);
-                                location.reload()
-                            }
-                        },
-                        error: function(ev){
-                            console.log(ev);
-                            
-                        }
-                    });
-                
-                }                
-                
-                // console.log('submmited',values);
-                        
-                        
-            });
-
-        }        
-
-        function revalidateForm(id){
-            let elem = $("#"+id);
-            let errorDiv = $(`#${id}-error`);
-            if(elem.val().length > 0){
-                elem.removeClass('is-invalid');
-                errorDiv.addClass('d-none');
-            }
-            else{
-                elem.addClass('is-invalid');
-                errorDiv.removeClass('d-none');
-                errorDiv.html(`${id} is required`)
-            }
-        }        
-    </script>
+    @include('pages.inventory-history.scripts')
 </x-layout>

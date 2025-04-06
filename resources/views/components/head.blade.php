@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="title" content="AdminLTE | Dashboard v3" />
 <meta name="author" content="ColorlibHQ" />
+<link rel="shortcut icon" href="{{ asset('public/assets/img/AdminLTELogo.png')}}" type="image/x-icon">
 <meta
   name="description"
   content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS."
@@ -44,3 +45,36 @@
 <link rel="stylesheet" href="{{ asset('public/assets/css/jquery-ui.min.css') }}">
 
 <script src="{{ asset('public/assets/js/jquery.min.js') }}"></script>
+<style>
+  /* HTML: <div class="loader"></div> */
+  .loader {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    border: 4px solid #0000;
+    border-radius: 50%;
+    border-color: #ccc #0000;
+    animation: l16 1s infinite linear;
+  }
+  .loader::before,
+  .loader::after {    
+    content: "";
+    grid-area: 1/1;
+    margin: 2px;
+    border: inherit;
+    border-radius: 50%;
+  }
+  .loader::before {
+    border-color: #f03355 #0000;
+    animation: inherit; 
+    animation-duration: .5s;
+    animation-direction: reverse;
+  }
+  .loader::after {
+    margin: 8px;
+  }
+  @keyframes l16 { 
+    100%{transform: rotate(1turn)}
+  }        
+      </style>
+  

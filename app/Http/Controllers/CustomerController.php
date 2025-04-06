@@ -10,10 +10,51 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::orderBy('id','desc')->get();
-        return view('pages.customers.list',compact('customers'));
+        $perPage = 10;
+        $currentPageNum = 1;
+
+        $isSingleView = false;
+        $view = 'pages.customers.list';
+        $query = Customer::query();
+        $query->orderBy('id','desc');
+        $skipCount = ($currentPageNum-1) * $perPage;
+
+        $totalRecords = Customer::count();
+
+        $pageNums = $totalRecords / $perPage;
+        $totalpagenums = is_float($pageNums) ? (int)$pageNums + 1 : $pageNums;
+
+
+        if(!empty($request->input('perPage'))){
+            $perPage = $request->input('perPage');
+            $isSingleView = true;
+        }
+        if(!empty($request->input('currentPage'))){
+            $currentPageNum = $request->input('currentPage');
+            $isSingleView = true;
+        }
+        if(!empty($request->input('searchString')) || $request->has('searchString')){
+            $searchString =$request->input('searchString');
+            $isSingleView = true;
+            $query->where('customer_name','LIKE',"%{$searchString}%");
+
+        }
+        $query->take($perPage);
+
+        $query->skip($skipCount);
+
+
+        if($isSingleView){
+            $view = 'pages.customers.single';
+
+        }
+        $customers = $query->get();
+
+
+
+        return view($view,compact('customers','totalpagenums','totalRecords'));
     }
 
     /**
@@ -33,12 +74,12 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'customer_name' => 'required|string',
             'address' => 'required|string',
-            'state' => 'string',
-            'state_code' => 'string',
-            'city' => 'string',
-            'phone' => 'string',
-            'gstin_number' => 'string',
-            'pan_number' => 'string',
+            'state' => 'required|string',
+            'state_code' => 'required|string',
+            'city' => 'required|string',
+            'phone' => 'required|string',
+            'gstin_number' => 'required|string',
+            'pan_number' => 'required|string',
 
         ]);
 
@@ -123,4 +164,103 @@ class CustomerController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Customer not Found!']);        
     }
+
+    public function exportCustomers(){
+        // Fetch products with their related measurements
+        $customers = Customer::get();
+
+        // Generate the filename
+        $filename = 'customers-' . now()->timestamp . '.csv';
+
+        // Define the path where the file will be stored
+        $filePath = storage_path('app/' . $filename);
+
+        // Open the file for writing
+        $handle = fopen($filePath, 'w');
+
+        // Add the CSV column headings (optional)
+        fputcsv($handle, ['ID','Customer Name', 'Address', 'State','State Code','City','Phone','GSTIN Number','PAN Number']);
+
+        // Loop through the data and write each row to the CSV file
+        foreach ($customers as $customer) {
+            // Write the product row to the CSV
+            fputcsv($handle, [
+                $customer->id,
+                $customer->customer_name,
+                $customer->address,
+                $customer->state,
+                $customer->state_code,
+                $customer->city,
+                $customer->phone,
+                $customer->gstin_number,
+                $customer->pan_number,
+            ]);
+        }
+
+        // Close the file handle
+        fclose($handle);
+
+        // Return the file path so it can be used for the download
+        return response()->json(['url_path'=> route('exportDownload',['file'=>$filename])]);
+
+    }
+
+    public function exportDownload(Request $request,$file){
+        $path = storage_path('app/' . $file);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path)->deleteFileAfterSend(true);        
+    }
+
+    public function importCustomers(Request $request){
+        // Validate the uploaded file
+        $request->validate([
+            'file_csv' => 'required|mimes:csv,txt|max:2048', // You can adjust file type and size
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('file_csv')) {
+            $file = $request->file('file_csv');
+
+            // Process the CSV (example)
+            $csvData = $this->parseCsv($file);
+            foreach ($csvData as $csv) {
+                // Use Laravel's Collection to transform the keys
+                $newArray = collect($csv)
+                    ->mapWithKeys(function ($value, $key) {
+                        // Convert the key to lowercase and replace spaces with underscores
+                        $newKey = strtolower(str_replace(' ', '_', $key));
+                        return [$newKey => $value];
+                    })
+                    ->toArray();
+                Customer::upsert($newArray,['id'],['customer_name','address','state','state_code','city','phone','gstin_number','pan_number']);
+                                
+            }
+
+            return response()->json(['success' => 'File uploaded successfully!']);
+        }
+
+        return response()->json(['error' => 'No file uploaded.'], 400);  
+    }    
+
+    private function parseCsv($file)
+    {
+        $csvData  = [];
+        $filePath = $file->getRealPath();
+        $file     = fopen($filePath, 'r');
+
+        // Assuming the first row contains headers
+        $header = fgetcsv($file);
+
+        while (($row = fgetcsv($file)) !== false) {
+            $csvData[] = array_combine($header, $row); // Combine headers with data
+        }
+
+        fclose($file);
+
+        return $csvData;
+    }        
 }

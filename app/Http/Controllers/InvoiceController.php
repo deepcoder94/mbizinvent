@@ -17,8 +17,45 @@ use ZipArchive;
 class InvoiceController extends Controller
 {
     public function invoiceList(Request $request){
-        $invoices = Invoice::with('customer')->get();
-        return view('pages.invoice.list',compact('invoices'));
+
+        $perPage = 10;
+        $currentPageNum = 1;
+
+        $isSingleView = false;
+        $view = 'pages.invoice.list';
+        $query = Invoice::query();
+        $query->orderBy('id','desc');
+        $skipCount = ($currentPageNum-1) * $perPage;
+
+        $totalRecords = Invoice::count();
+
+        $pageNums = $totalRecords / $perPage;
+        $totalpagenums = is_float($pageNums) ? (int)$pageNums + 1 : $pageNums;
+
+
+        if(!empty($request->input('perPage'))){
+            $perPage = $request->input('perPage');
+            $isSingleView = true;
+        }
+        if(!empty($request->input('currentPage'))){
+            $currentPageNum = $request->input('currentPage');
+            $isSingleView = true;
+        }
+
+        $query->take($perPage);
+
+        $query->skip($skipCount);
+        $query->with('customer');
+
+
+        if($isSingleView){
+            $view = 'pages.invoice.single';
+
+        }
+        $invoices = $query->get();
+
+
+        return view($view,compact('invoices','totalpagenums','totalRecords'));
     }
 
     public function showGenerateForm(){

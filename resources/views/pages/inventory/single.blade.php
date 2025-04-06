@@ -1,6 +1,9 @@
 @forelse ($inventory as $i)
 <tr>
     <td>
+        {{ $i->product->id }}
+    </td>
+    <td>
         {{ $i->product->hsn_code }}
     </td>
     <td>{{ $i->product->product_description }}</td>
