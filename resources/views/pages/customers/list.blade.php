@@ -105,16 +105,16 @@
                 let values = $("#addEditForm").serializeArray();  
                 let isFormValid = true;
                 let errors = [];
-                values.some((v)=>{
+                // values.some((v)=>{
                     
-                    if(v.value.length == 0){
-                        errors.push({
-                            key: v.name,
-                            error: `${v.name} is required`
-                        });
-                        isFormValid = false
-                    }                    
-                });
+                //     if(v.value.length == 0){
+                //         errors.push({
+                //             key: v.name,
+                //             error: `${v.name} is required`
+                //         });
+                //         isFormValid = false
+                //     }                    
+                // });
 
                 if(errors.length > 0){
                     

@@ -33,12 +33,12 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'customer_name' => 'required|string',
             'address' => 'required|string',
-            'state' => 'required|string',
-            'state_code' => 'required|string',
-            'city' => 'required|string',
-            'phone' => 'required|string',
-            'gstin_number' => 'required|string',
-            'pan_number' => 'required|string',
+            'state' => 'string',
+            'state_code' => 'string',
+            'city' => 'string',
+            'phone' => 'string',
+            'gstin_number' => 'string',
+            'pan_number' => 'string',
 
         ]);
 

@@ -228,6 +228,9 @@
                 $("#total_sgst_h").html(0)
                 $("#total_grand").html(0)
                 $("#total_grand_h").html(0)
+                productCount=0
+                invProducts.clear();
+                location.reload()
             },
             error: function(err){
 
