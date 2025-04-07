@@ -206,7 +206,7 @@
             contentType: false,  // Important for FormData            
             data:fData,
             success: function (response) {
-                window.location.href = response.zipUrl;  
+
                 $("#invForm")[0].reset();
                 $("#total_quantity").html(0)
                 $("#total_quantity_h").html(0)
@@ -228,6 +228,11 @@
                 $("#total_sgst_h").html(0)
                 $("#total_grand").html(0)
                 $("#total_grand_h").html(0)
+                document.querySelectorAll('.invoiceProducts').forEach(el => el.remove());
+                invProducts.clear();
+                productCount = 0
+                window.location.href = response.zipUrl;  
+
             },
             error: function(err){
 

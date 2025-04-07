@@ -126,6 +126,32 @@ class InvoiceController extends Controller
             'round_off'=>$invoice['total_round_off'],
             'total'=>$invoice['total_grand']
         ]);
+        $customer = Customer::where('id',$data['customer_id'])->first();
+        $settings = Settings::get()->first();
+
+        $custhtml='';
+        if(!empty($customer->customer_name)){
+            $custhtml .= 'Name: '.$customer->customer_name;
+        }
+        if(!empty($customer->address)){
+            $custhtml .= '<br>Address: '.$customer->address;
+        }        
+        if(!empty($customer->state)){
+            $custhtml .= '<br>State: '.$customer->state;
+        }                
+        if(!empty($customer->state_code)){
+            $custhtml .= '<br>State Code: '.$customer->state_code;
+        }                
+        if(!empty($customer->gstin_number)){
+            $custhtml .= '<br>GSTIN Number: '.$customer->gstin_number;
+        }                
+        if(!empty($customer->phone)){
+            $custhtml .= '<br>Mobile: '.$customer->phone;
+        }                        
+        if(!empty($customer->pan_number)){
+            $custhtml .= '<br>PAN Number: '.$customer->pan_number;
+        }                                
+
 
         foreach($invoice['products'] as $p){
            $product = Inventory::where('product_id',$p['product_id'])->get()->first();
@@ -150,33 +176,49 @@ class InvoiceController extends Controller
             ]);
         }
 
-        $customer = Customer::where('id',$data['customer_id'])->first();
-        $settings = Settings::get()->first();
 
         // Create a new ZIP file in storage
         $time = time();
-        $zipFileName = 'invoices'.$time.'.zip';
-        $zipFilePath = storage_path('app/' . $zipFileName);
-        $zip = new ZipArchive();
+        $invno = $insinvoice->invoice_number;
+        $filename = 'invoices-'.$invno."-".$time.'.pdf';
+        $filePath = storage_path('app/' . $filename);
+
+        // $zipFileName = $filename.'.zip';
+        // $zipFilePath = storage_path('app/' . $zipFileName);
+        // $zip = new ZipArchive();
 
         // Open the zip file for writing
-        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
-            return response()->json(['error' => 'Failed to create zip file'], 500);
-        }        
-            $pdf = PDF::loadView('pages.generate-invoice.invoice-format',compact('invoice','customer','settings'));
-            $pdf->setPaper('A5','landscape');
-            $pdfContent = $pdf->output();
+        // if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+        //     return response()->json(['error' => 'Failed to create zip file'], 500);
+        // }        
+
+        
+            $pdf = PDF::loadView('pages.generate-invoice.invoice-format',compact('invoice','customer','settings','custhtml'));
+            // $pdf->setPaper('A5','landscape');
+            $pdf->setPaper('a4', 'portrait');
+
+            // Set individual DOMPDF options correctly
+            $pdf->set_option('defaultFont', 'Arial');
+            $pdf->set_option('isHtml5ParserEnabled', true);
+            $pdf->set_option('isRemoteEnabled', true);
+            $pdf->set_option('isPhpEnabled', true);
+            $pdf->set_option('margin_top', 0);
+            $pdf->set_option('margin_bottom', 0);
+            $pdf->set_option('margin_left', 0);
+            $pdf->set_option('margin_right', 0);            
+            // $pdfContent = $pdf->output();
+            file_put_contents($filePath, $pdf->output());
 
             // Add the PDF to the zip with a unique filename (e.g., invoice number)
-            $zip->addFromString('invoices'.$time.'.pdf', $pdfContent);
+            // $zip->addFromString($filename.'.pdf', $pdfContent);
 
 
         // Close the zip file
-        $zip->close();
+        // $zip->close();
 
         // Prepare the zip file for download
         return response()->json([
-            'zipUrl' => route('downloadZip', ['file' => $zipFileName])
+            'zipUrl' => route('downloadZip', ['file' => $filename])
         ]);
         
     }

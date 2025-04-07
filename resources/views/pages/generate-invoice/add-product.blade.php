@@ -1,5 +1,5 @@
 
-<tr id="product_{{ $index }}">
+<tr id="product_{{ $index }}" class="invoiceProducts">
     <td>
         <div class="form-group">
             <select name="product_id[]" id="product_id_{{ $index }}" class="form-control" onchange="populateValues('{{$index}}',event)">
