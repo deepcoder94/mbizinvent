@@ -68,6 +68,13 @@
                                             <span id="pan_number-error" class="error invalid-feedback d-none" ></span>
                                         </div>
                                     </div>                                                                                                                                
+                                    <div class="col-lg-6 mt-3">
+                                        <div class="form-group">
+                                            <label for="pan_number">Profit Calculation</label>
+                                            <input type="text" class="form-control" required name="profit_calc" id="profit_calc" value="{{ $setting->profit_calc ?? ''  }}" onkeyup="revalidateForm('profit_calc')" />
+                                            <span id="profit_calc-error" class="error invalid-feedback d-none" ></span>
+                                        </div>
+                                    </div>                                                                                                                                                                    
                                 </div>
     
                             </form>

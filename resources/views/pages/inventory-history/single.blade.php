@@ -7,9 +7,9 @@
     <td>
         {{ $i->stock_out_in }}
     </td>
-    <td>
+    <!-- <td>
         {{ $i->buying_price }}
-    </td>    
+    </td>     -->
     <td>
         <span class="badge {{ $i->action == 'added'?'bg-success':'bg-danger' }}">{{ $i->action }}</span>
     </td>

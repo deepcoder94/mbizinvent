@@ -20,7 +20,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="customer_id">Select Customer</label>
-                                            <select name="customer_id" id="customer_id" class="form-control sel2input">
+                                            <select name="customer_id" id="customer_id" class="form-control">
                                                 @forelse ($customers as $c)
                                                     <option value="{{ $c->id }}">{{ $c->customer_name }}</option>
                                                 @empty
@@ -56,10 +56,12 @@
                                         <tr>
                                             <th>Product</th>
                                             <th>Qty</th>
-                                            <th>MRP</th>
-                                            <th>Profit</th>
-                                            <td>Disc. %</td>
-                                            <td>Disc. Amt</td>
+                                            <th>Rate</th>
+                                            <th>Gross Total</th>
+                                            <td>Discount</td>
+                                            <td>Taxable Value</td>
+                                            <th>Tax Rate <br/> (%)</th>
+                                            <th>Total</th>
                                             <th>#</th>
                                         </tr>
                                     </thead>
@@ -77,11 +79,27 @@
                                     <thead>
                                         <tr>
                                             <th>Qty</th>
-                                            <td>Disc. %</td>
-                                            <td>Disc. Amt</td>
+                                            <th>Rate</th>
+                                            <th>Gross Total</th>
+                                            <td>Discount</td>
                                             <td>Taxable Value</td>
+                                            <th colspan="2">CGST</th>
+                                            <th colspan="2">SGST</th>
                                             <th>Round Off</th>
                                             <th>Total</th>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                     </thead>
                                     @include('pages.generate-invoice.total-invoice')

@@ -9,7 +9,9 @@ class InventoryHistory extends Model
 {
     public $timestamps = false;
     protected $table = 'inventory_history';
-    protected $fillable = ['product_id','stock_out_in','buying_price','action'];
+    // protected $fillable = ['product_id','stock_out_in','buying_price','action'];
+
+    protected $fillable = ['product_id','stock_out_in','action'];
 
     public function product(){
         return $this->belongsTo(Product::class,'product_id');

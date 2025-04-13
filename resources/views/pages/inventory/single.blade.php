@@ -10,9 +10,9 @@
     <td>
         {{ $i->available_stock }}
     </td>
-    <td>
+    <!-- <td>
         {{ $i->buying_price }}
-    </td>
+    </td> -->
     <td>
         {{ \Carbon\Carbon::parse($i->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}        
     </td>

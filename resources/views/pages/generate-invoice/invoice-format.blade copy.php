@@ -149,11 +149,9 @@
                 <th>Product Description</th>
                 <th>Qty</th>
                 <th>HSN Code</th>
-                <th>MRP</th>
                 <th>Rate</th>
                 <th>Gross Total</th>
-                <th>Scheme Amt</th>
-                <th>Disc.</th>
+                <th>Discount</th>
                 <th>Taxable Value</th>
                 <th colspan="2">CGST</th>
                 <th colspan="2">SGST</th>
@@ -169,8 +167,6 @@
                 <td></td>
                 <td></td>
                 <td>%</td>
-                <td></td>
-                <td>%</td>
                 <td>Amt</td>
                 <td>%</td>
                 <td>Amt</td>
@@ -182,10 +178,8 @@
                 <td>{{ $p['product_description'] }}</td>
                 <td>{{$p['quantity']}}</td>
                 <td>{{$p['hsn_code']}}</td>
-                <td>{{ $p['mrp'] }}</td>
                 <td>{{ $p['rate'] }}</td>
                 <td>{{ $p['gross_total'] }}</td>
-                <td>{{ $p['discount_amt'] }}</td>
                 <td>{{ $p['discount'] }}</td>
                 <td>{{ $p['taxable_value'] }}</td>
                 <td>{{ $p['cgst_perc'] }}</td>
@@ -203,8 +197,7 @@
             <tr>
                 <th>Total Qty</th>
                 <th>Gross Total</th>
-                <th>Disc. %</th>
-                <th>Disc. Amt.</th>
+                <th>Discount</th>
                 <th>Taxable Amount</th>
                 <th>CGST Amt</th>
                 <th>SGST Amt</th>
@@ -215,7 +208,6 @@
                 <td>{{ $invoice['total_quantity'] }}</td>
                 <td>{{ $invoice['total_gross_sum'] }}</td>
                 <td>{{ $invoice['total_discount'] }}</td>
-                <td>{{ $invoice['total_discount_amt'] }}</td>
                 <td>{{ $invoice['total_taxable_value'] }}</td>
                 <td>{{ $invoice['total_cgst'] }}</td>
                 <td>{{ $invoice['total_sgst'] }}</td>

@@ -61,7 +61,8 @@ class InvoiceController extends Controller
     public function showGenerateForm(){
         $customers = Customer::get();
         $invoiceCount = Invoice::count() + 1;
-        return view('pages.generate-invoice.form',compact('customers','invoiceCount'));
+        $settings = Settings::get()->first();
+        return view('pages.generate-invoice.form',compact('customers','invoiceCount','settings'));
     }
 
     public function addSingleProduct(Request $request){
@@ -88,9 +89,11 @@ class InvoiceController extends Controller
                 'product_description' => $product->product_description,
                 'hsn_code' => $product->hsn_code,
                 'quantity' => $data['product_qty'][$index],
+                'mrp' => $data['product_mrp'][$index],
                 'rate' => $data['product_rate'][$index],
                 'gross_total' => $data['product_gross_total'][$index],
                 'discount' => $data['product_discount'][$index],
+                'discount_amt' => $data['product_discount_amt'][$index],
                 'taxable_value' => $data['product_taxable_value'][$index],
                 'tax_rate' => $data['product_tax_rate'][$index],
                 'cgst_perc' => $data['product_cgst_perc'][$index],
@@ -101,6 +104,7 @@ class InvoiceController extends Controller
             ];
         })->toArray();
 
+
         // Final structured array
         $invoice = [
             'customer_id' => $data['customer_id'],
@@ -109,16 +113,19 @@ class InvoiceController extends Controller
             'products' => $products,
             'total_round_off' => $data['total_round_off'],
             'total_quantity' => $data['total_quantity'],
-            'total_rate' => $data['total_rate'],
-            'total_gross_sum' => $data['total_gross_sum'],
+            'total_mrp' => $data['total_rate'],
             'total_discount' => $data['total_discount'],
+            'total_discount_amt' => $data['total_discount_amt'],
             'total_taxable_value' => $data['total_taxable_value'],
+            'total_gross_sum' => $data['total_gross_sum'],
             'total_cgst' => $data['total_cgst'],
             'total_cgst_perc' => $data['total_cgst_perc'],
             'total_sgst' => $data['total_sgst'],
             'total_sgst_perc' => $data['total_sgst_perc'],
             'total_grand' => $data['total_grand']
         ];
+
+
 
         $insinvoice = Invoice::create([
             'invoice_number'=>$invoice['invoice_number'],
@@ -143,13 +150,13 @@ class InvoiceController extends Controller
             $custhtml .= '<br>State Code: '.$customer->state_code;
         }                
         if(!empty($customer->gstin_number)){
-            $custhtml .= '<br>GSTIN Number: '.$customer->gstin_number;
+            $custhtml .= '<br>GSTIN No: '.$customer->gstin_number;
         }                
         if(!empty($customer->phone)){
             $custhtml .= '<br>Mobile: '.$customer->phone;
         }                        
         if(!empty($customer->pan_number)){
-            $custhtml .= '<br>PAN Number: '.$customer->pan_number;
+            $custhtml .= '<br>PAN: '.$customer->pan_number;
         }                                
 
 
@@ -161,7 +168,7 @@ class InvoiceController extends Controller
            InventoryHistory::create([
                 'product_id'=>$p['product_id'],
                 'stock_out_in'=>$p['quantity'],
-                'buying_price'=>$p['rate'],
+                // 'buying_price'=>$p['rate'],
                 'action'=>'removed'
             ]);
 
@@ -237,9 +244,12 @@ class InvoiceController extends Controller
     public function getProductInfo(Request $request){
         $id = $request->input('id');
         $product = Product::with('stock')->where('id',$id)->get()->first();
+        $settings = Settings::get()->first();
+
         return response()->json([
             'success'=>true,
-            'data'=>$product
+            'data'=>$product,
+            'profit'=>$settings->profit_calc
         ]); 
     }
 }

@@ -28,6 +28,7 @@ class DashboardController extends Controller
             'phone' => 'required',
             'gstin_number' => 'required',
             'pan_number' => 'required',
+            'profit_calc'=>'required'
         ]);
 
         $setting = Settings::where('id',1)->get()->first();
@@ -40,6 +41,8 @@ class DashboardController extends Controller
             $setting->phone = $validated['phone'];
             $setting->gstin_number = $validated['gstin_number'];
             $setting->pan_number = $validated['pan_number'];
+            $setting->profit_calc = $validated['profit_calc'];
+
             $setting->save();
             return response()->json(['success' => true, 'message' => 'Setting updated successfully!']);            
 
