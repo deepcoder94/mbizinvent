@@ -64,7 +64,9 @@
       }
 
       $( function() {
-    $( ".datepicker" ).datepicker();
+    $( ".datepicker").datepicker({
+      defaultDate: new Date() // optional
+    }).datepicker("setDate", new Date());;
   } );
 
     </script>

@@ -72,14 +72,14 @@ class CustomerController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'customer_name' => 'required|string',
-            'address' => 'required|string',
-            'state' => 'required|string',
-            'state_code' => 'string',
-            'city' => 'string',
-            'phone' => 'string',
-            'gstin_number' => 'string',
-            'pan_number' => 'string',
+            'customer_name' => '',
+            'address' => '',
+            'state' => '',
+            'state_code' => '',
+            'city' => '',
+            'phone' => '',
+            'gstin_number' => '',
+            'pan_number' => '',
 
         ]);
 

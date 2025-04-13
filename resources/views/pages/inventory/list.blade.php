@@ -27,7 +27,7 @@
                             <th>HSN Code</th>
                             <th>Product Description</th>
                             <th>Available Stock</th>
-                            <th>Buying Price</th>
+                            <!-- <th>Buying Price</th> -->
                             <th>Updated Date</th>
                           </tr>
                         </thead>

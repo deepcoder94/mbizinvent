@@ -26,7 +26,7 @@ class InventoryController extends Controller
                 Inventory::create([
                     'product_id'=>$ex->id,
                     'available_stock'=>0,
-                    'buying_price'=>$ex->rate
+                    // 'buying_price'=>$ex->rate
                 ]);
             }
         }
@@ -54,7 +54,7 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'product_id' => 'required',
             'stock_count' => 'required',
-            'buying_price' => 'required',
+            // 'buying_price' => 'required',
         ]);
 
         $inventory = Inventory::where('product_id',$validated['product_id'])->first();
@@ -62,7 +62,7 @@ class InventoryController extends Controller
             InventoryHistory::create([
                 'product_id'=>$validated['product_id'],
                 'stock_out_in'=>$validated['stock_count'],
-                'buying_price'=>$validated['buying_price'],
+                // 'buying_price'=>$validated['buying_price'],
                 'action'=>'added'
             ]);
 
@@ -75,7 +75,7 @@ class InventoryController extends Controller
         Inventory::create([
             'product_id'=>$validated['product_id'],
             'available_stock'=>$validated['stock_count'],
-            'buying_price'=>$validated['buying_price'],
+            // 'buying_price'=>$validated['buying_price'],
         ]);
 
         return response()->json(['success' => true, 'message' => 'Inventory created successfully!']);            
@@ -163,7 +163,9 @@ class InventoryController extends Controller
         $handle = fopen($filePath, 'w');
 
         // Add the CSV column headings (optional)
-        fputcsv($handle, ['Product ID','Product Description', 'Stock', 'Buying Price']);
+        // fputcsv($handle, ['Product ID','Product Description', 'Stock', 'Buying Price']);
+        fputcsv($handle, ['Product ID','Product Description', 'Stock']);
+
 
         // Loop through the data and write each row to the CSV file
         foreach ($inventory as $i) {
@@ -172,7 +174,7 @@ class InventoryController extends Controller
                 $i->product->id,
                 $i->product->product_description,
                 $i->available_stock,
-                $i->buying_price,
+                // $i->buying_price,
             ]);
         }
 
@@ -210,13 +212,13 @@ class InventoryController extends Controller
                     InventoryHistory::create([
                         'product_id'=>$newArray['product_id'],
                         'stock_out_in'=>$newArray['stock']-$inv->available_stock,
-                        'buying_price'=>$newArray['buying_price'],
+                        // 'buying_price'=>$newArray['buying_price'],
                         'action'=>'added'
                     ]);
                 }
 
                 $inv->available_stock = $newArray['stock'];
-                $inv->buying_price = $newArray['buying_price'];
+                // $inv->buying_price = $newArray['buying_price'];
 
                 $inv->save();
             }

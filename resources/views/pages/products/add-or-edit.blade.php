@@ -15,5 +15,9 @@
           <input type="text" class="form-control" required name="rate" id="rate" value="{{ $product->rate ?? ''  }}" onkeyup="revalidateForm('rate')" />
         <span id="rate-error" class="error invalid-feedback d-none" ></span>
       </div>
-         
+      <div class="form-group mt-2">
+          <label for="rate">GST Percentage</label>
+          <input type="text" class="form-control" required name="gst_percentage" id="gst_percentage" value="{{ $product->gst_percentage ?? ''  }}" onkeyup="revalidateForm('gst_percentage')" />
+        <span id="gst_percentage-error" class="error invalid-feedback d-none" ></span>
+      </div>         
     </form>

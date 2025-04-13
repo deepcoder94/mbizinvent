@@ -57,6 +57,7 @@
                                             <th>HSN Code</th>
                                             <th>Product Description</th>
                                             <th>Rate</th>
+                                            <th>GST %</th>
                                             <th>Created Date</th>
                                             <th>Action</th>
                                         </tr>
