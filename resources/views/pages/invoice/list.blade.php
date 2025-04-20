@@ -10,11 +10,12 @@
                       <h3 class="card-title">Invoice List</h3>
       
                       <div class="card-tools d-flex">
-                        <input type="text" id="" class="form-control" placeholder="Search Product">
+                        <input type="text" id="" class="form-control" placeholder="Search Invoice">
                       </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body p-0">
+                     <button type="button" class="btn btn-primary mt-3 ml-2" style="margin-left:22px">Generate Selected</button>
                       <table class="table" id="invTable">
                         <thead>
                           <tr>

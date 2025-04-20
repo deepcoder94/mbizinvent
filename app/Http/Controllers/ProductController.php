@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Inventory;
+use App\Models\InventoryHistory;
+
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -77,12 +80,16 @@ class ProductController extends Controller
             'product_description' => 'required|string',
             'hsn_code' => 'required',
             'rate' => 'required',
+            'gst_percentage' => 'required',
+
         ]);
 
         Product::create([
             'product_description'=>$validated['product_description'],
             'hsn_code'=>$validated['hsn_code'],
             'rate'=>$validated['rate'],
+            'gst_percentage'=>$validated['gst_percentage'],
+
         ]);
 
         return response()->json(['success' => true, 'message' => 'Product created successfully!']);        
@@ -115,6 +122,8 @@ class ProductController extends Controller
             'product_description' => 'required|string',
             'hsn_code' => 'required',
             'rate' => 'required',
+            'gst_percentage' => 'required',
+
         ]);
 
         $product = Product::findOrFail($id);
@@ -122,6 +131,8 @@ class ProductController extends Controller
             $product->product_description = $validated['product_description'];
             $product->hsn_code = $validated['hsn_code'];
             $product->rate = $validated['rate'];
+            $product->gst_percentage = $validated['gst_percentage'];
+            
 
             $product->save();
         }
@@ -136,6 +147,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         if($product){
+            Inventory::where('product_id')->delete();
+            InventoryHistory::where('product_id')->delete();            
             $product->delete();
             return response()->json(['success' => true, 'message' => 'Product deleted successfully!']);
             
@@ -157,7 +170,7 @@ class ProductController extends Controller
         $handle = fopen($filePath, 'w');
 
         // Add the CSV column headings (optional)
-        fputcsv($handle, ['ID','Hsn Code', 'Product Description', 'rate']);
+        fputcsv($handle, ['ID','Hsn Code', 'Product Description', 'rate','GST percentage']);
 
         // Loop through the data and write each row to the CSV file
         foreach ($products as $p) {
@@ -167,6 +180,8 @@ class ProductController extends Controller
                 $p->hsn_code,
                 $p->product_description,
                 $p->rate,
+                $p->gst_percentage,
+
             ]);
         }
 
@@ -200,7 +215,7 @@ class ProductController extends Controller
                     })
                     ->toArray();
                     
-                Product::upsert($newArray,['id'],['product_description','hsn_code','rate']);
+                Product::upsert($newArray,['id'],['product_description','hsn_code','rate','gst_percentage']);
                                 
             }
 

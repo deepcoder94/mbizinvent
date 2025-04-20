@@ -9,5 +9,5 @@ class Settings extends Model
 {
     public $timestamps = false;
     protected $table = 'settings';
-    protected $fillable = ['dist_name','address','city','state','state_code','phone','gstin_number','pan_number'];
+    protected $fillable = ['dist_name','address','city','state','state_code','phone','gstin_number','pan_number','profit_calc'];
 }

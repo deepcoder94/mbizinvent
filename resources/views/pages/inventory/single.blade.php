@@ -1,18 +1,18 @@
 @forelse ($inventory as $i)
 <tr>
     <td>
-        {{ $i->product->id }}
+        {{ $i->product->id ?? '' }}
     </td>
     <td>
-        {{ $i->product->hsn_code }}
+        {{ $i->product->hsn_code ?? '' }}
     </td>
-    <td>{{ $i->product->product_description }}</td>
+    <td>{{ $i->product->product_description ?? '' }}</td>
     <td>
-        {{ $i->available_stock }}
+        {{ $i->available_stock ?? '' }}
     </td>
-    <td>
+    <!-- <td>
         {{ $i->buying_price }}
-    </td>
+    </td> -->
     <td>
         {{ \Carbon\Carbon::parse($i->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}        
     </td>

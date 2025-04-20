@@ -43,6 +43,7 @@
 />
 
 <link rel="stylesheet" href="{{ asset('public/assets/css/jquery-ui.min.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 
 <script src="{{ asset('public/assets/js/jquery.min.js') }}"></script>
 <style>
@@ -77,4 +78,10 @@
     100%{transform: rotate(1turn)}
   }        
       </style>
-  
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script>
+    $(function(){
+      $(".sel2input").select2()   
+
+    });
+  </script>

@@ -11,6 +11,9 @@
         {{ $p->rate }}
     </td>
     <td>
+        {{ $p->gst_percentage }}
+    </td>    
+    <td>
         {{ \Carbon\Carbon::parse($p->created_at)->timezone('Asia/Kolkata')->format('d-m-Y H:i:s') }}        
     </td>
 

@@ -31,6 +31,10 @@ Route::group(['prefix'=>'invoice'], function(){
     Route::post('/product-info',[InvoiceController::class,'getProductInfo'])->name('getProductInfo');
 
     Route::get('/download-zip/{file}', [InvoiceController::class, 'downloadZip'])->name('downloadZip');
+    Route::get('/download-sample', [InvoiceController::class, 'downloadSample'])->name('downloadSample');
+    Route::get('/get-sample', [InvoiceController::class, 'getSample'])->name('getSample');    
+    Route::post('/gen-inv',[InvoiceController::class,'genInv'])->name('geninv');
+    
 
 });
 

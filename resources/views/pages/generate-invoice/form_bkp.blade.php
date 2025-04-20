@@ -1,10 +1,4 @@
 <x-layout>
-    <style>
-.select2-container {
-    width: 300px !important;
-}
-        
-    </style>
     <div class="app-content mt-3">
         <section class="content">
             <div class="container-fluid">
@@ -14,12 +8,6 @@
                   <div class="card">
                     <div class="card-header">
                       <h3 class="card-title">Generate Invoice</h3>
-                      <button class="btn btn-primary ml-4" style="margin-left: 14px" onclick="uploadInvoice()" id="upinvbtn">
-                         <span id="uploadinv">Upload Invoice</span> 
-                         <span id="uploading" style="display:none">Uploading <i class="nav-icon bi bi-hourglass-bottom"></i></span>                          
-                      </button>
-                      <input type="file" id="csv-file" accept=".csv" style="display: none" onchange="uploadBulk()" />                                              
-                      <button class="btn btn-primary ml-4" style="margin-left: 14px" onclick="downloadSample()">Download Sample</button>                      
                     </div>  
                     <form id="invForm" method="POST">
                     <div class="card-body">
@@ -32,7 +20,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="customer_id">Select Customer</label>
-                                            <select name="customer_id" id="customer_id" class="form-control sel2input">
+                                            <select name="customer_id" id="customer_id" class="form-control">
                                                 @forelse ($customers as $c)
                                                     <option value="{{ $c->id }}">{{ $c->customer_name }}</option>
                                                 @empty
@@ -68,11 +56,12 @@
                                         <tr>
                                             <th>Product</th>
                                             <th>Qty</th>
-                                            <th>MRP</th>
-                                            <th>Profit</th>
-                                            <td>Disc. %</td>
-                                            <td>Disc. Amt</td>
-                                            <td>Rate</td>
+                                            <th>Rate</th>
+                                            <th>Gross Total</th>
+                                            <td>Discount</td>
+                                            <td>Taxable Value</td>
+                                            <th>Tax Rate <br/> (%)</th>
+                                            <th>Total</th>
                                             <th>#</th>
                                         </tr>
                                     </thead>
@@ -90,11 +79,27 @@
                                     <thead>
                                         <tr>
                                             <th>Qty</th>
-                                            <td>Disc. %</td>
-                                            <td>Disc. Amt</td>
+                                            <th>Rate</th>
+                                            <th>Gross Total</th>
+                                            <td>Discount</td>
                                             <td>Taxable Value</td>
+                                            <th colspan="2">CGST</th>
+                                            <th colspan="2">SGST</th>
                                             <th>Round Off</th>
                                             <th>Total</th>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td>%</td>
+                                            <td>Amt</td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                     </thead>
                                     @include('pages.generate-invoice.total-invoice')

@@ -64,7 +64,10 @@
       }
 
       $( function() {
-    $( ".datepicker" ).datepicker();
+    $( ".datepicker").datepicker({
+      dateFormat: "dd-mm-yy",        // <-- Add this line
+      defaultDate: new Date() // optional
+    }).datepicker("setDate", new Date());;
   } );
 
     </script>

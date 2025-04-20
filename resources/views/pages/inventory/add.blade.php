@@ -15,9 +15,9 @@
         <input type="text" class="form-control" required name="stock_count" id="stock_count"  onkeyup="revalidateForm('stock_count')" />
         <span id="stock_count-error" class="error invalid-feedback d-none" ></span>
       </div> 
-      <div class="form-group mt-2">
+      <!-- <div class="form-group mt-2">
         <label for="buying_price">Buying Price</label>
         <input type="text" class="form-control" required name="buying_price" id="buying_price"  onkeyup="revalidateForm('buying_price')" />
         <span id="buying_price-error" class="error invalid-feedback d-none" ></span>
-      </div>          
+      </div>           -->
     </form>

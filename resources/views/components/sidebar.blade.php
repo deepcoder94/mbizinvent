@@ -36,43 +36,43 @@
                 </li>
                 <li class="nav-item">
                   <a href="{{ route('customers.index') }}" class="nav-link {{ Route::currentRouteName() == 'customers.index'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-people-fill"></i>
                     <p>Manage Customers</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{ route('products.index') }}" class="nav-link {{ Route::currentRouteName() == 'products.index'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-basket-fill"></i>
                     <p>Manage Products</p>
                   </a>
                 </li>                
                 <li class="nav-item">
                   <a href="{{ route('inventory.index') }}" class="nav-link {{ Route::currentRouteName() == 'inventory.index'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-list-nested"></i>
                     <p>Manage Inventory</p>
                   </a>
                 </li>                                
                 <li class="nav-item">
                   <a href="{{ route('inventoryHistory') }}" class="nav-link {{ Route::currentRouteName() == 'inventoryHistory'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-table"></i>
                     <p>Inventory History</p>
                   </a>
                 </li>                                                
                 <li class="nav-item">
                   <a href="{{ route('viewSettings') }}" class="nav-link {{ Route::currentRouteName() == 'viewSettings'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-gear"></i>
                     <p>Manage Settings</p>
                   </a>
                 </li>                                                
                 <li class="nav-item">
                   <a href="{{ route('showGenerateForm') }}" class="nav-link {{ Route::currentRouteName() == 'showGenerateForm'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-clipboard2-plus"></i>
                     <p>Generate Invoice</p>
                   </a>
                 </li>                                                
                 <li class="nav-item">
                   <a href="{{ route('invoiceList') }}" class="nav-link {{ Route::currentRouteName() == 'invoiceList'?'active':'' }}">
-                    <i class="nav-icon bi bi-palette"></i>
+                    <i class="nav-icon bi bi-clipboard-data"></i>
                     <p>Invoice List</p>
                   </a>
                 </li>                                                
