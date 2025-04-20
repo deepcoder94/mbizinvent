@@ -31,7 +31,15 @@ Route::group(['prefix'=>'invoice'], function(){
     Route::post('/product-info',[InvoiceController::class,'getProductInfo'])->name('getProductInfo');
 
     Route::get('/download-zip/{file}', [InvoiceController::class, 'downloadZip'])->name('downloadZip');
-    Route::get('/download-sample', [InvoiceController::class, 'downloadSample'])->name('downloadSample');
+    Route::get('/download-sample/{file}', function(){
+        $filePath = storage_path('app/public/sample_invoice.csv');
+
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+    
+        return response()->download($filePath);        
+    })->name('downloadSample');
     Route::get('/get-sample', [InvoiceController::class, 'getSample'])->name('getSample');    
     Route::post('/gen-inv',[InvoiceController::class,'genInv'])->name('geninv');
     

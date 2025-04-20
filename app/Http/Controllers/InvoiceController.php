@@ -730,7 +730,15 @@ class InvoiceController extends Controller
         return $rounded;
     }
 
-    public function getSample(){
-        
+    public function downloadSample(){
+        $file = "sample_invoice.csv";
+
+        $path = storage_path('app/public/' . $file);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path)->deleteFileAfterSend(false);        
     }
 }

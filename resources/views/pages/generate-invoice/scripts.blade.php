@@ -362,26 +362,17 @@
     }    
     
     function downloadSample(){
-                $.ajax({
-                    url: "{{ route('getSample') }}",
-                    method: 'GET',
-                    data: {},
-                    headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                        "content"
-                    ), // CSRF Token
-                    },
-                    processData: false, // Don't process the data
-                    contentType: false, // Don't set content-type header
-                    success: function(response) {
-                        window.location.href = response.zipUrl;   
-                    },
-                    error: function(xhr, status, error) {
-                        alert(error)
+        let fileName='sample_invoice.csv';
+    // Construct the URL to download the file using the 'downloadZip' route
+    const url = '{{ route('downloadSample', ':file') }}'.replace(':file', fileName);
 
-                    }
-                });                     
-        
+    // Create a hidden link and simulate clicking it to download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     }
 
 </script>
