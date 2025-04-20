@@ -222,7 +222,6 @@
                 <td>{{ $invoice['total_sgst'] }}</td>
                 <td>{{ $invoice['total_round_off'] }}</td>
                 <td>{{ $invoice['total_grand'] }}</td>            
-                
             </tr>
         </table>
     </div>

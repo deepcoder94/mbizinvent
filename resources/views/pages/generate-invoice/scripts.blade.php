@@ -129,7 +129,6 @@
 
         $(`#product_total_amt_${index}`).val(finalAmt);
 
-
         // console.log(setting_profit);
         
 
@@ -176,7 +175,7 @@
         // $(`#product_gross_total_${index}`).val(grosstotal);
         // $(`#product_taxable_value_${index}`).val(taxableValue)
         // $(`#product_total_amt_${index}`).val(grandTotal);
-        
+
         calcGroupTotal()
     }
 
@@ -246,7 +245,6 @@
 
         $("#total_grand").html(total_amts);            
         $("#total_grand_h").val(total_amts);            
-
         
 
 
