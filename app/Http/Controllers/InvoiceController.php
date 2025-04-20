@@ -283,7 +283,11 @@ class InvoiceController extends Controller
             $file = $request->file('file_csv');
         }
 
-        $path = $request->file('file_csv')->store('csv_files','public');
+        $oripath = $path = $request->file('file_csv')->store('csv_files','public');
+
+        // Debug
+        // dd($path); // Make sure it's like: "csv_files/filename.csv"
+
 
             // // Process the CSV (example)
             // $csvData = $this->parseCsv($file);
@@ -653,12 +657,25 @@ class InvoiceController extends Controller
             // file_put_contents($filePath, $pdf->output());
             Storage::disk('public')->put($filename, $pdf->output());
 
-            // Add the PDF to the zip with a unique filename (e.g., invoice number)
-            // $zip->addFromString($filename.'.pdf', $pdfContent);
+            // $folder = 'public/csv_files';
 
+            // $files = Storage::files($folder); // Gets all files in the folder
+            // Storage::delete($files);          // Deletes all files
+            Storage::disk('public')->delete($path);
 
+            // dd(Storage::deleteDirectory('public/csv_files'));
+
+// // Then recreate it if needed:
+// Storage::makeDirectory('public/csv_files');
+//             // Add the PDF to the zip with a unique filename (e.g., invoice number)
+//             // $zip->addFromString($filename.'.pdf', $pdfContent);
+
+//         dd('12');
         // Close the zip file
         // $zip->close();
+        if (Storage::disk('public')->exists($oripath)) {
+            Storage::disk('public')->delete($oripath);
+        }
 
         // Prepare the zip file for download
         return response()->json([
@@ -711,5 +728,9 @@ class InvoiceController extends Controller
 
         $rounded = ceil($value * pow(10, $precision)) / pow(10, $precision);
         return $rounded;
+    }
+
+    public function getSample(){
+        
     }
 }
