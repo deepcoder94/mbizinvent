@@ -167,8 +167,8 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td>Amt</td>
                 <td>%</td>
+                <td>Amt</td>
                 <td></td>
                 <td>%</td>
                 <td>Amt</td>
@@ -185,8 +185,8 @@
                 <td>{{ $p['mrp'] }}</td>
                 <td>{{ $p['rate'] }}</td>
                 <td>{{ $p['gross_total'] }}</td>
-                <td>{{ $p['discount_amt'] }}</td>
                 <td>{{ $p['discount'] }}</td>
+                <td>{{ $p['discount_amt'] }}</td>
                 <td>{{ $p['taxable_value'] }}</td>
                 <td>{{ $p['cgst_perc'] }}</td>
                 <td>{{ $p['cgst'] }}</td>
@@ -203,25 +203,24 @@
             <tr>
                 <th>Total Qty</th>
                 <th>Gross Total</th>
-                <th>Cash Disc. %</th>
-                <th>Cash Disc. Amt.</th>                
-                <th>Taxable Amt</th>
+                <th>Disc. %</th>
+                <th>Disc. Amt.</th>
+                <th>Taxable Amount</th>
                 <th>CGST Amt</th>
                 <th>SGST Amt</th>
                 <th>Round Off</th>
-                <th>Grand Total</th>            
-                
+                <th>Grand Total</th>
             </tr>
             <tr>
                 <td>{{ $invoice['total_quantity'] }}</td>
                 <td>{{ $invoice['total_gross_sum'] }}</td>
-                <td>{{ $invoice['invoice_total_discount'] }}</td>
-                <td>{{ $invoice['invoice_total_discount_amt'] }}</td>                
+                <td>{{ $invoice['total_discount'] }}</td>
+                <td>{{ $invoice['total_discount_amt'] }}</td>
                 <td>{{ $invoice['total_taxable_value'] }}</td>
                 <td>{{ $invoice['total_cgst'] }}</td>
                 <td>{{ $invoice['total_sgst'] }}</td>
                 <td>{{ $invoice['total_round_off'] }}</td>
-                <td>{{ $invoice['total_grand'] }}</td>            
+                <td>{{ $invoice['total_grand'] }}</td>
             </tr>
         </table>
     </div>

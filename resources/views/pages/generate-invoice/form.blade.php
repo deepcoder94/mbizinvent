@@ -1,4 +1,10 @@
 <x-layout>
+    <style>
+.select2-container {
+    width: 300px !important;
+}
+        
+    </style>
     <div class="app-content mt-3">
         <section class="content">
             <div class="container-fluid">
@@ -8,6 +14,12 @@
                   <div class="card">
                     <div class="card-header">
                       <h3 class="card-title">Generate Invoice</h3>
+                      <button class="btn btn-primary ml-4" style="margin-left: 14px" onclick="uploadInvoice()" id="upinvbtn">
+                         <span id="uploadinv">Upload Invoice</span> 
+                         <span id="uploading" style="display:none">Uploading <i class="nav-icon bi bi-hourglass-bottom"></i></span>                          
+                      </button>
+                      <input type="file" id="csv-file" accept=".csv" style="display: none" onchange="uploadBulk()" />                                              
+                      <button class="btn btn-primary ml-4" style="margin-left: 14px" onclick="downloadSample()">Download Sample</button>                      
                     </div>  
                     <form id="invForm" method="POST">
                     <div class="card-body">
@@ -60,6 +72,7 @@
                                             <th>Profit</th>
                                             <td>Disc. %</td>
                                             <td>Disc. Amt</td>
+                                            <td>Rate</td>
                                             <th>#</th>
                                         </tr>
                                     </thead>

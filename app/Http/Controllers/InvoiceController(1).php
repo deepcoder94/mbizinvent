@@ -15,6 +15,7 @@ use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class InvoiceController extends Controller
 {
     public function invoiceList(Request $request){
@@ -89,7 +90,7 @@ class InvoiceController extends Controller
                 'product_id' => $id,
                 'product_description' => $product->product_description,
                 'hsn_code' => $product->hsn_code,
-                'quantity' => $data['product_qty'][$index],
+                'quantity' => number_format($data['product_qty'][$index],0),
                 'mrp' => $data['product_mrp'][$index],
                 'rate' => $data['product_rate'][$index],
                 'gross_total' => $data['product_gross_total'][$index],
@@ -101,7 +102,7 @@ class InvoiceController extends Controller
                 'cgst' => $data['product_cgst'][$index],
                 'sgst_perc' => $data['product_sgst_perc'][$index],
                 'sgst' => $data['product_sgst'][$index],
-                'total_amount' => $data['product_total_amt'][$index],
+                'total_amount' => $data['product_total_amt'][$index] + $data['product_cgst'][$index] + $data['product_sgst'][$index],
             ];
         })->toArray();
 
@@ -113,7 +114,7 @@ class InvoiceController extends Controller
             'invoice_date' => $data['invoice_date'],
             'products' => $products,
             'total_round_off' => $data['total_round_off'],
-            'total_quantity' => $data['total_quantity'],
+            'total_quantity' => number_format($data['total_quantity'],0),
             'total_mrp' => $data['total_rate'],
             'total_discount' => $data['total_discount'],
             'total_discount_amt' => $data['total_discount_amt'],
@@ -189,7 +190,7 @@ class InvoiceController extends Controller
         $time = time();
         $invno = $insinvoice->invoice_number;
         $filename = 'invoices-'.$invno."-".$time.'.pdf';
-        $filePath = storage_path('app/public/' . $filename);
+        $filePath = storage_path('app/' . $filename);
 
         // $zipFileName = $filename.'.zip';
         // $zipFilePath = storage_path('app/' . $zipFileName);
@@ -241,6 +242,23 @@ class InvoiceController extends Controller
 
         return response()->download($path)->deleteFileAfterSend(true);
     }    
+    
+    public function downloadSample(){
+        $path = storage_path('app/public/invoices2.csv');
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        
+        return response()->download($path);
+    }
+    
+    public function getSample(){
+
+        return response()->json([
+            'zipUrl' => route('downloadSample')
+        ]);        
+    }
 
     public function getProductInfo(Request $request){
         $id = $request->input('id');
@@ -253,24 +271,7 @@ class InvoiceController extends Controller
             'profit'=>$settings->profit_calc
         ]); 
     }
-
-    private function parseCsv($file)
-    {
-        $csvData  = [];
-        $filePath = $file->getRealPath();
-        $file     = fopen($filePath, 'r');
-
-        // Assuming the first row contains headers
-        $header = fgetcsv($file);
-
-        while (($row = fgetcsv($file)) !== false) {
-            $csvData[] = array_combine($header, $row); // Combine headers with data
-        }
-
-        fclose($file);
-
-        return $csvData;
-    }            
+    
 
     public function genInv(Request $request){
 
@@ -339,10 +340,6 @@ class InvoiceController extends Controller
                     'profit' => [],
                     'discount_percentage' => [],
                     'discount_amount' => [],
-                    'total_discount_percentage' => [],
-                    'total_discount_amount' => [],
-                    'total_round_off' => [],
-
                 ];
         
                 foreach ($item as $field => $value) {
@@ -350,31 +347,22 @@ class InvoiceController extends Controller
                         $grouped[$index]['profit'][$field] = $value;
                     } elseif (preg_match('/^Discount \d+ %$/', $field)) {
                         $grouped[$index]['discount_percentage'][$field] = $value;
-
                     } elseif (preg_match('/^Total Discount \d+ %$/', $field)) {
                         // $grouped[$index]['total_discount_percentage'][$field] = $value;
-                        $grouped[$index]['total_discount_percentage'][$field] = $value;
-
+                        $newc[$mainKey]['total_discount_percentage'][] = $value;
                     }
                     elseif (preg_match('/^Total Discount \d+ Amount$/', $field)) {
                         // $grouped[$index]['total_discount_amount'][$field] = $value;
-                        $grouped[$index]['total_discount_amount'][$field] = $value;
+                        $newc[$mainKey]['total_discount_amount'][] = $value;
 
                     }                    
-                    elseif (preg_match('/^Total Round Off$/', $field)) {
-                        // $grouped[$index]['total_discount_amount'][$field] = $value;
-                        $grouped[$index]['total_round_off'][$field] = $value;
-
-                    }                                        
                      elseif (preg_match('/^Discount \d+ Amount$/', $field)) {
                         $grouped[$index]['discount_amount'][$field] = $value;
                     }
                 }
-
                 $newc[$mainKey]['products'][$index]['results'] = $grouped;
                 // $collection[$mainKey][$index]['products'] = $grouped;
             }
-
 
         }
 
@@ -389,12 +377,6 @@ class InvoiceController extends Controller
         $total_single_gst_rate = 0;
         $total_single_gst_perc = 0;
         $total_grand = 0;
-        $total_disc_perc = 0;
-        $total_disc_perc_value = 0;
-        $total_disc_amount = 0;
-        $total_gst_deduction = 0;
-        $total_gst = 0;
-        $total_round_off = 0;
 
 
         foreach($newc as $index => $c){
@@ -452,29 +434,11 @@ class InvoiceController extends Controller
                 $totaltaxableamount+=$taxable_value;
 
 
-                $tdcalc = $p['results'][$first_key]['total_discount_percentage'];
-                foreach($tdcalc as $d => $v){
-                    if(!empty($v)){
-                        $disc =  floatval($v)/100 + 1;
-                        $total_disc_perc_value += $disc;
-                        $total_disc_perc += floatval($v);
-                    }
-                }
-
-                $tdacalc = $p['results'][$first_key]['total_discount_amount'];
-                foreach($tdacalc as $d => $v){
-                    if(!empty($v)){
-                        $total_disc_amount += floatval($v);
-                    }
-                }
-
-
                 if(!empty($p['GST %'])){
                     $total_single_gst_perc += floatval($p['GST %']);
 
                     $gst_perc =  floatval($p['GST %'])/100;
                     $gst_total = $taxable_value * $gst_perc;
-                    $total_gst+=$gst_total;
                     $total_single_gst_rate += $gst_total / 2;
                     $total_with_gst = $taxable_value+$gst_total;
                     $total_grand += $total_with_gst;
@@ -504,21 +468,10 @@ class InvoiceController extends Controller
                 ];
             }
 
-            if($total_disc_perc_value !=0){
-                $totaltaxableamount /= $total_disc_perc_value;
-            }
-            if($total_disc_amount !=0){
-                $totaltaxableamount -= $total_disc_amount;
-            }            
-            $total_grand = $totaltaxableamount + $total_gst;
-
-
             $finalArray['total_quantity'] = $this->roundOff($totalquantity,2);
             $finalArray['total_mrp'] = $this->roundOff($totalmrp,2);
             $finalArray['total_discount'] = $this->roundOff(floatval($totaldcalc),2);
             $finalArray['total_discount_amt'] = $this->roundOff($totaldacalc,2);
-            $finalArray['invoice_total_discount'] = $this->roundOff($total_disc_perc,2);
-            $finalArray['invoice_total_discount_amt'] = $this->roundOff($total_disc_amount,2);
             $finalArray['total_taxable_value'] = $this->roundOff(floatval($totaltaxableamount));
             $finalArray['total_gross_sum'] = $this->roundOff(floatval($totalgrosssum));
             $finalArray['total_cgst'] = $this->roundOff(floatval($total_single_gst_rate));
@@ -625,6 +578,12 @@ class InvoiceController extends Controller
 
         // Close the zip file
         // $zip->close();
+        // Convert full path to relative storage path:
+        $relativePath = str_replace(storage_path('app/public') . '/', '', $path);
+        
+        // Now delete
+        Storage::disk('public')->delete($relativePath);
+
 
         // Prepare the zip file for download
         return response()->json([
@@ -677,5 +636,5 @@ class InvoiceController extends Controller
 
         $rounded = ceil($value * pow(10, $precision)) / pow(10, $precision);
         return $rounded;
-    }
+    }    
 }

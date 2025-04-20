@@ -1,8 +1,8 @@
 
 <tr id="product_{{ $index }}" class="invoiceProducts">
-    <td>
+    <td style="width:200px">
         <div class="form-group">
-            <select name="product_id[]" id="product_id_{{ $index }}" class="form-control sel2input" onchange="populateValues('{{$index}}',event)">
+            <select name="product_id[]" id="product_id_{{ $index }}" class="form-control sel2input" onchange="populateValues('{{$index}}',event)" style="width:100%">
                 <option value="">Select</option>
                 @forelse ($products as $p)
                     <option value="{{ $p->id }}">{{ $p->product_description }}</option>
@@ -41,7 +41,10 @@
         <div class="form-group">
             <input type="text" name="product_discount_amt[]" id="product_discount_amt_{{ $index }}" class="form-control product_discount_amt" onkeyup="calculateTotal('{{$index}}')" value="0">
         </div>
-    </td>            
+    </td>     
+    <td id="pd_rate_{{ $index }}">
+        
+    </td>
     <td>
             <input type="hidden" name="product_tax_rate[]" id="product_tax_rate_{{ $index }}" class="form-control product_tax_rate" value="0">
             <input type="hidden" name="product_gross_total[]" id="product_gross_total_{{ $index }}" class="form-control product_gross_total" value="0">

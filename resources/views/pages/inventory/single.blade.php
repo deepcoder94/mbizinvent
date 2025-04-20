@@ -1,14 +1,14 @@
 @forelse ($inventory as $i)
 <tr>
     <td>
-        {{ $i->product->id }}
+        {{ $i->product->id ?? '' }}
     </td>
     <td>
-        {{ $i->product->hsn_code }}
+        {{ $i->product->hsn_code ?? '' }}
     </td>
-    <td>{{ $i->product->product_description }}</td>
+    <td>{{ $i->product->product_description ?? '' }}</td>
     <td>
-        {{ $i->available_stock }}
+        {{ $i->available_stock ?? '' }}
     </td>
     <!-- <td>
         {{ $i->buying_price }}

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Inventory;
+use App\Models\InventoryHistory;
+
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -144,6 +147,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         if($product){
+            Inventory::where('product_id')->delete();
+            InventoryHistory::where('product_id')->delete();            
             $product->delete();
             return response()->json(['success' => true, 'message' => 'Product deleted successfully!']);
             
