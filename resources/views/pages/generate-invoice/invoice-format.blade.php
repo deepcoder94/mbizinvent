@@ -145,18 +145,16 @@
     <div class="section">
         <table>
             <tr>
-                <th>#</th>
+                <th>S.No.</th>
                 <th>Product Description</th>
                 <th>Qty</th>
                 <th>HSN Code</th>
-                <th>MRP</th>
                 <th>Rate</th>
                 <th>Gross Total</th>
-                <th>Disc.</th>
-                <th>Disc.</th>
+                <th colspan="2">Disc.</th>
                 <th>Taxable Value</th>
-                <th colspan="2">CGST</th>
-                <th colspan="2">SGST</th>
+                <th>CGST</th>
+                <th>SGST</th>
                 <th>Total</th>
             </tr>
             <tr>
@@ -166,14 +164,11 @@
                 <td></td>
                 <td></td>
                 <td></td>
+                <td>%</td>
+                <td>Amt</td>
                 <td></td>
-                <td>Amt</td>
-                <td>%</td>
                 <td></td>
-                <td>%</td>
-                <td>Amt</td>
-                <td>%</td>
-                <td>Amt</td>
+                <td></td>
                 <td></td>
             </tr>
             @foreach ($invoice['products'] as $i => $p)
@@ -182,16 +177,13 @@
                 <td>{{ $p['product_description'] }}</td>
                 <td>{{$p['quantity']}}</td>
                 <td>{{$p['hsn_code']}}</td>
-                <td>{{ $p['mrp'] }}</td>
                 <td>{{ $p['rate'] }}</td>
                 <td>{{ $p['gross_total'] }}</td>
-                <td>{{ $p['discount_amt'] }}</td>
                 <td>{{ $p['discount'] }}</td>
+                <td>{{ $p['discount_amt'] }}</td>
                 <td>{{ $p['taxable_value'] }}</td>
-                <td>{{ $p['cgst_perc'] }}</td>
-                <td>{{ $p['cgst'] }}</td>
-                <td>{{ $p['sgst_perc']}}</td>
-                <td>{{ $p['sgst'] }}</td>
+                <td>({{ $p['cgst_perc'] }}%) {{ $p['cgst'] }}</td>
+                <td>({{ $p['sgst_perc']}}%) {{ $p['sgst'] }}</td>
                 <td>{{$p['total_amount']}}</td>
             </tr>
             @endforeach
@@ -203,8 +195,7 @@
             <tr>
                 <th>Total Qty</th>
                 <th>Gross Total</th>
-                <th>Cash Disc. %</th>
-                <th>Cash Disc. Amt.</th>                
+                <th>Cash Discount</th>
                 <th>Taxable Amt</th>
                 <th>CGST Amt</th>
                 <th>SGST Amt</th>
@@ -215,8 +206,7 @@
             <tr>
                 <td>{{ $invoice['total_quantity'] }}</td>
                 <td>{{ $invoice['total_gross_sum'] }}</td>
-                <td>{{ $invoice['invoice_total_discount'] }}</td>
-                <td>{{ $invoice['invoice_total_discount_amt'] }}</td>                
+                <td>({{ $invoice['invoice_total_discount'] }}%) {{ $invoice['invoice_total_discount_amt'] }}</td>
                 <td>{{ $invoice['total_taxable_value'] }}</td>
                 <td>{{ $invoice['total_cgst'] }}</td>
                 <td>{{ $invoice['total_sgst'] }}</td>

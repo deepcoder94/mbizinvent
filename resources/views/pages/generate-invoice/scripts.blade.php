@@ -347,7 +347,10 @@
                     success: function(response) {
                         window.location.href = response.zipUrl;   
                         $("#uploadinv").css('display','block');
-                        $("#uploading").css('display','none');                        
+                        $("#uploading").css('display','none');  
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);                      
                     },
                     error: function(xhr, status, error) {
                         alert(error)

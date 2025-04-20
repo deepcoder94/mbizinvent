@@ -337,6 +337,7 @@ class InvoiceController extends Controller
 
                 $grouped[$index] = [
                     'profit' => [],
+                    'rate_discount_percentage'=>[],
                     'discount_percentage' => [],
                     'discount_amount' => [],
                     'total_discount_percentage' => [],
@@ -351,7 +352,13 @@ class InvoiceController extends Controller
                     } elseif (preg_match('/^Discount \d+ %$/', $field)) {
                         $grouped[$index]['discount_percentage'][$field] = $value;
 
-                    } elseif (preg_match('/^Total Discount \d+ %$/', $field)) {
+                    } 
+                    elseif (preg_match('/^Rate Discount \d+ %$/', $field)) {
+                        // $grouped[$index]['total_discount_percentage'][$field] = $value;
+                        $grouped[$index]['rate_discount_percentage'][$field] = $value;
+
+                    }
+                    elseif (preg_match('/^Total Discount \d+ %$/', $field)) {
                         // $grouped[$index]['total_discount_percentage'][$field] = $value;
                         $grouped[$index]['total_discount_percentage'][$field] = $value;
 
@@ -413,7 +420,13 @@ class InvoiceController extends Controller
                 $total_with_gst=0;
 
                 $first_key = array_key_first($p['results']);
+
+
+                // Rate Calculation Start
+
                 $totalquantity += floatval($p['Quantity']);
+
+                // Profit Calculation
                 $totalpcalc = 0;
                 $pcalc = $p['results'][$first_key]['profit'];
                 foreach($pcalc as $d => $v){
@@ -424,6 +437,19 @@ class InvoiceController extends Controller
                         $totalpcalc += floatval($v);    
                     }
                 }
+
+                // Rate Discount Calculation
+                $totalratediscountcalc = 0;
+                $ratediscounts = $p['results'][$first_key]['rate_discount_percentage'];
+                foreach($ratediscounts as $d => $v){
+                    if(!empty($v)){
+                        $disc =  floatval($v)/100 + 1;
+
+                        $rate /= $disc;
+
+                        $totalratediscountcalc += floatval($v);    
+                    }
+                }                
 
                 $gross_value = $rate * floatval($p['Quantity']);
                 $totalgrosssum+=$gross_value;
@@ -455,7 +481,7 @@ class InvoiceController extends Controller
                 $tdcalc = $p['results'][$first_key]['total_discount_percentage'];
                 foreach($tdcalc as $d => $v){
                     if(!empty($v)){
-                        $disc =  floatval($v)/100 + 1;
+                        $disc =  floatval($v)/100;
                         $total_disc_perc_value += $disc;
                         $total_disc_perc += floatval($v);
                     }
@@ -504,13 +530,19 @@ class InvoiceController extends Controller
                 ];
             }
 
-            if($total_disc_perc_value !=0){
-                $totaltaxableamount /= $total_disc_perc_value;
+
+            if($total_disc_perc !=0){
+                $totaltaxableamount = $totaltaxableamount - ($totaltaxableamount * ($total_disc_perc / 100));
+                $total_disc_amount_inv = ($totaltaxableamount * ($total_disc_perc / 100));
             }
             if($total_disc_amount !=0){
                 $totaltaxableamount -= $total_disc_amount;
             }            
             $total_grand = $totaltaxableamount + $total_gst;
+            
+            if($finalArray['total_round_off'] != 0){
+                $total_grand += floatval($finalArray['total_round_off']);
+            }
 
 
             $finalArray['total_quantity'] = $this->roundOff($totalquantity,2);
@@ -518,7 +550,7 @@ class InvoiceController extends Controller
             $finalArray['total_discount'] = $this->roundOff(floatval($totaldcalc),2);
             $finalArray['total_discount_amt'] = $this->roundOff($totaldacalc,2);
             $finalArray['invoice_total_discount'] = $this->roundOff($total_disc_perc,2);
-            $finalArray['invoice_total_discount_amt'] = $this->roundOff($total_disc_amount,2);
+            $finalArray['invoice_total_discount_amt'] = $this->roundOff($total_disc_amount_inv,2);
             $finalArray['total_taxable_value'] = $this->roundOff(floatval($totaltaxableamount));
             $finalArray['total_gross_sum'] = $this->roundOff(floatval($totalgrosssum));
             $finalArray['total_cgst'] = $this->roundOff(floatval($total_single_gst_rate));
@@ -529,11 +561,13 @@ class InvoiceController extends Controller
         }
 
 
+
         $insinvoice = Invoice::create([
             'invoice_number'=>$finalArray['invoice_number'],
             'customer_id'=>$finalArray['customer_id'],
             'round_off'=>$finalArray['total_round_off'],
-            'total'=>$finalArray['total_grand']
+            'total'=>$finalArray['total_grand'],
+            'csv'=>json_encode($csv)
         ]);
         $customer = Customer::where('id',$finalArray['customer_id'])->first();
         $settings = Settings::get()->first();
