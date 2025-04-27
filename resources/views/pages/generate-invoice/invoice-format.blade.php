@@ -187,34 +187,45 @@
                 <td>{{$p['total_amount']}}</td>
             </tr>
             @endforeach
+            <tr>
+                <td colspan="2" style="font-weight:bold">Total</td>
+                <td style="font-weight:bold">{{ $invoice['total_quantity'] }}</td>    
+                <td colspan="2"></td>
+                <td style="font-weight:bold">{{ $invoice['total_gross_sum'] }}</td>
+                <td colspan="2"></td>
+                <td style="font-weight:bold">{{ $invoice['product_total_taxv'] }}</td>
+                <td style="font-weight:bold">{{ $invoice['total_cgst'] }}</td>
+                <td style="font-weight:bold">{{ $invoice['total_sgst'] }}</td>
+                <td style="font-weight:bold">{{ $invoice['total_grand2'] }}</td>
+            </tr>
         </table>
     </div>
 
     <div class="section">
         <table>
+
             <tr>
-                <th>Total Qty</th>
-                <th>Gross Total</th>
-                <th>Cash Discount</th>
-                <th>Taxable Amt</th>
-                <th>CGST Amt</th>
-                <th>SGST Amt</th>
-                <th>Round Off</th>
-                <th>Grand Total</th>            
-                
-            </tr>
-            <tr>
-                <td>{{ $invoice['total_quantity'] }}</td>
-                <td>{{ $invoice['total_gross_sum'] }}</td>
+                <td colspan="4" style="width:180px"></td>
+                <td style="font-weight:bold">Discount</td>
                 <td>({{ $invoice['invoice_total_discount'] }}%) {{ $invoice['invoice_total_discount_amt'] }}</td>
+            </tr>    
+            <tr>
+                <td colspan="4" style="width:180px"></td>
+                <td style="font-weight:bold">Taxable Amt.</td>
                 <td>{{ $invoice['total_taxable_value'] }}</td>
-                <td>{{ $invoice['total_cgst'] }}</td>
-                <td>{{ $invoice['total_sgst'] }}</td>
+            </tr>    
+            <tr>
+                <td colspan="4" style="width:180px"></td>
+                <td style="font-weight:bold">Round Off.</td>
                 <td>{{ $invoice['total_round_off'] }}</td>
-                <td>{{ $invoice['total_grand'] }}</td>            
-            </tr>
+            </tr>                
+            <tr>
+                <td colspan="4" style="width:180px"></td>
+                <td style="font-weight:bold">Grand Total</td>
+                <td style="font-weight:bold">{{ $invoice['total_grand'] }}</td>
+            </tr>                            
         </table>
     </div>
-
+    
 </body>
 </html>

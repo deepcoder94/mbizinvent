@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class InvoiceController extends Controller
@@ -270,62 +271,10 @@ class InvoiceController extends Controller
         fclose($file);
 
         return $csvData;
-    }            
-
-    public function genInv(Request $request){
-
-        $request->validate([
-            'file_csv' => 'required|mimes:csv,txt|max:2048', // You can adjust file type and size
-        ]);
-
-        // Handle file upload
-        if ($request->hasFile('file_csv')) {
-            $file = $request->file('file_csv');
-        }
-
-        $oripath = $path = $request->file('file_csv')->store('csv_files','public');
-
-        // Debug
-        // dd($path); // Make sure it's like: "csv_files/filename.csv"
-
-
-            // // Process the CSV (example)
-            // $csvData = $this->parseCsv($file);
-
-        $path = storage_path('app/public/'.$path);
-
-        // Step 1: Read the CSV into array of rows
-        $csv = array_map('str_getcsv', file($path));
-
-        // Step 2: Extract headers
-        $headers = array_shift($csv);        
-        // dd($csvData,$csv,$headers);
-
-        // Step 3: Group by Invoice No
-        $invoices = [];
-        $currentInvoiceNo = null;
-
-        foreach ($csv as $row) {
-            // Combine headers with values, and trim each value
-            $rowData = collect($headers)->combine($row)->map(fn($val) => trim($val))->toArray();
-
-            // If the row has a new invoice number, update tracker
-            if (!empty($rowData['Invoice No'])) {
-                $currentInvoiceNo = $rowData['Invoice No'];
-            }
-
-            // If an invoice number is being tracked, assign this row to it
-            if ($currentInvoiceNo) {
-                // Remove 'Invoice No' from row (since it's already the key)
-                unset($rowData['Invoice No']);
-                $invoices[$currentInvoiceNo][] = $rowData;
-            }
-        }
-
-        // Step 4: Convert to collection (optional)
-        $collection = collect($invoices)->toArray(); 
+    }       
+    
+    public function prepareCsv($collection){
         $newc = [];
-
         foreach ($collection as $mainKey => $items) {
             $customer_id = $items[0]['Customer ID'];
             $invoice_date = $items[0]['Invoice Date'];
@@ -388,8 +337,10 @@ class InvoiceController extends Controller
 
 
         }
+        return $newc;
+    }
 
-
+    public function calculateInvoice($newc){
         $finalArray=[];
         $totaldcalc = 0;
         $totaldacalc = 0;
@@ -447,9 +398,9 @@ class InvoiceController extends Controller
                 $ratediscounts = $p['results'][$first_key]['rate_discount_percentage'];
                 foreach($ratediscounts as $d => $v){
                     if(!empty($v)){
-                        $disc =  floatval($v)/100 + 1;
+                        $disc =  floatval($v)/100;
 
-                        $rate /= $disc;
+                        $rate -= $rate * $disc;
 
                         $totalratediscountcalc += floatval($v);    
                     }
@@ -462,8 +413,8 @@ class InvoiceController extends Controller
                 $tdclc = 0;
                 foreach($dcalc as $d => $v){
                     if(!empty($v)){
-                        $disc =  floatval($v)/100 + 1;
-                        $rate /= $disc;
+                        $disc =  floatval($v)/100;
+                        $rate -= $rate * $disc;
                         $totaldcalc += floatval($v);
                         $tdclc +=floatval($v);
                     }
@@ -533,11 +484,16 @@ class InvoiceController extends Controller
                     
                 ];
             }
+            
+            $finalArray['product_total_taxv'] =  $this->roundOff(floatval($totaltaxableamount));
+            
+            $finalArray['total_grand2'] =  $this->roundOff(floatval($totaltaxableamount + $total_gst),2);            
 
-
+            $totaltaxableamount = $totalgrosssum;
+            $total_disc_amount_inv = $totaltaxableamount;
             if($total_disc_perc !=0){
-                $totaltaxableamount = $totaltaxableamount - ($totaltaxableamount * ($total_disc_perc / 100));
-                $total_disc_amount_inv = ($totaltaxableamount * ($total_disc_perc / 100));
+                $total_disc_amount_inv = ($totaltaxableamount * ($total_disc_perc/100));
+                $totaltaxableamount = $totaltaxableamount - ($totaltaxableamount * ($total_disc_perc/100));
             }
             if($total_disc_amount !=0){
                 $totaltaxableamount -= $total_disc_amount;
@@ -564,15 +520,11 @@ class InvoiceController extends Controller
             $finalArray['total_grand'] = $this->roundOff(floatval($total_grand));
         }
 
+        return $finalArray;
 
+    }
 
-        $insinvoice = Invoice::create([
-            'invoice_number'=>$finalArray['invoice_number'],
-            'customer_id'=>$finalArray['customer_id'],
-            'round_off'=>$finalArray['total_round_off'],
-            'total'=>$finalArray['total_grand'],
-            'csv'=>json_encode($csv)
-        ]);
+    public function prepareInvoiceLayout($finalArray,$insinvoice){
         $customer = Customer::where('id',$finalArray['customer_id'])->first();
         $settings = Settings::get()->first();
 
@@ -629,15 +581,6 @@ class InvoiceController extends Controller
         $invno = $insinvoice->invoice_number;
         $filename = 'invoices-'.$time.'.pdf';
         $filePath = storage_path('app/' . $filename);
-
-        // $zipFileName = $filename.'.zip';
-        // $zipFilePath = storage_path('app/' . $zipFileName);
-        // $zip = new ZipArchive();
-
-        // Open the zip file for writing
-        // if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
-        //     return response()->json(['error' => 'Failed to create zip file'], 500);
-        // }        
             $invoice = $finalArray;
         
             $pdf = PDF::loadView('pages.generate-invoice.invoice-format',compact('invoice','customer','settings','custhtml'));
@@ -653,74 +596,80 @@ class InvoiceController extends Controller
             $pdf->set_option('margin_bottom', 0);
             $pdf->set_option('margin_left', 0);
             $pdf->set_option('margin_right', 0);            
-            // $pdfContent = $pdf->output();
-            // file_put_contents($filePath, $pdf->output());
             Storage::disk('public')->put($filename, $pdf->output());
+        return $filename;   
+    }
 
-            // $folder = 'public/csv_files';
+    public function genInv(Request $request){
+        try{
 
-            // $files = Storage::files($folder); // Gets all files in the folder
-            // Storage::delete($files);          // Deletes all files
-            Storage::disk('public')->delete($path);
+            $file = $request->file('file_csv');
 
-            // dd(Storage::deleteDirectory('public/csv_files'));
 
-// // Then recreate it if needed:
-// Storage::makeDirectory('public/csv_files');
-//             // Add the PDF to the zip with a unique filename (e.g., invoice number)
-//             // $zip->addFromString($filename.'.pdf', $pdfContent);
+            $request->file('file_csv')->store('csv_files','public');
 
-//         dd('12');
-        // Close the zip file
-        // $zip->close();
-        if (Storage::disk('public')->exists($oripath)) {
-            Storage::disk('public')->delete($oripath);
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();      
+            $headers = array_shift($rows);        
+            $invoices = [];
+            $currentInvoiceNo = null;
+
+            foreach ($rows as $row) {
+                // Combine headers with values, and trim each value
+                $rowData = collect($headers)->combine($row)->map(fn($val) => trim($val))->toArray();
+    
+                // If the row has a new invoice number, update tracker
+                if (!empty($rowData['Invoice No'])) {
+                    $currentInvoiceNo = $rowData['Invoice No'];
+                }
+    
+                // If an invoice number is being tracked, assign this row to it
+                if ($currentInvoiceNo) {
+                    // Remove 'Invoice No' from row (since it's already the key)
+                    unset($rowData['Invoice No']);
+                    $invoices[$currentInvoiceNo][] = $rowData;
+                }
+            }
+
+            // Step 4: Convert to collection (optional)
+            $collection = collect($invoices)->toArray(); 
+            $newc = [];
+    
+            $newc = $this->prepareCsv($collection);
+
+            $finalArray = $this->calculateInvoice($newc);
+            
+    
+    
+            $insinvoice = Invoice::create([
+                'invoice_number'=>$finalArray['invoice_number'],
+                'customer_id'=>$finalArray['customer_id'],
+                'round_off'=>$finalArray['total_round_off'],
+                'total'=>$finalArray['total_grand'],
+                'csv'=>json_encode($rows)
+            ]);
+
+            $filename = $this->prepareInvoiceLayout($finalArray,$insinvoice);
+
+            // Prepare the zip file for download
+            return response()->json([
+                'zipUrl' => route('downloadZip', ['file' => $filename])
+            ]);
+
+
+
+
+    
+    
+    
+
+
+        }
+        catch(\Exception $e){
+            dd($e->getMessage(),$e->getFile(),$e->getLine());
         }
 
-        // Prepare the zip file for download
-        return response()->json([
-            'zipUrl' => route('downloadZip', ['file' => $filename])
-        ]);
-        
-
-        // Final structured array
-        // $invoice = [
-        //     'customer_id' => $data['customer_id'],
-        //     'invoice_number' => $data['invoice_number'],
-        //     'invoice_date' => $data['invoice_date'],
-        //     'products' => $products,
-        //     'total_round_off' => $data['total_round_off'],
-        //     'total_quantity' => $data['total_quantity'],
-        //     'total_mrp' => $data['total_rate'],
-        //     'total_discount' => $data['total_discount'],
-        //     'total_discount_amt' => $data['total_discount_amt'],
-        //     'total_taxable_value' => $data['total_taxable_value'],
-        //     'total_gross_sum' => $data['total_gross_sum'],
-        //     'total_cgst' => $data['total_cgst'],
-        //     'total_cgst_perc' => $data['total_cgst_perc'],
-        //     'total_sgst' => $data['total_sgst'],
-        //     'total_sgst_perc' => $data['total_sgst_perc'],
-        //     'total_grand' => $data['total_grand']
-        // ];
-
-            // return [
-            //     'product_id' => $id,
-            //     'product_description' => $product->product_description,
-            //     'hsn_code' => $product->hsn_code,
-            //     'quantity' => $data['product_qty'][$index],
-            //     'mrp' => $data['product_mrp'][$index],
-            //     'rate' => $data['product_rate'][$index],
-            //     'gross_total' => $data['product_gross_total'][$index],
-            //     'discount' => $data['product_discount'][$index],
-            //     'discount_amt' => $data['product_discount_amt'][$index],
-            //     'taxable_value' => $data['product_taxable_value'][$index],
-            //     'tax_rate' => $data['product_tax_rate'][$index],
-            //     'cgst_perc' => $data['product_cgst_perc'][$index],
-            //     'cgst' => $data['product_cgst'][$index],
-            //     'sgst_perc' => $data['product_sgst_perc'][$index],
-            //     'sgst' => $data['product_sgst'][$index],
-            //     'total_amount' => $data['product_total_amt'][$index],
-            // ];
 
     }
 
